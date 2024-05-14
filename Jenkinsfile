@@ -42,14 +42,14 @@ pipeline {
     }
     post {
         always {
-            // Clean up: Stop and remove the Docker container
+
             script {
                 sh 'docker stop demo-app-container || true'
                 sh 'docker rm demo-app-container || true'
             }
         }
         cleanup {
-            // Remove the Docker image
+
             script {
                 sh 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
             }
