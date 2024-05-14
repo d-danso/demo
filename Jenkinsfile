@@ -1,10 +1,17 @@
 pipeline {
-    agent { docker { image 'maven:3.9.6-eclipse-temurin-17-alpine' } }
+    agent {
+        label 'docker' // Use a Docker-enabled agent
+    }
     environment {
         DOCKER_IMAGE = 'demo-app'
         DOCKER_TAG = 'latest'
     }
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Build') {
             steps {
                 sh 'mvn clean package -DskipTests'
@@ -18,14 +25,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                 }
             }
         }
         stage('Run Docker Container') {
             steps {
                 script {
-                    // Run the Docker container in detached mode (-d)
                     sh 'docker run -d -p 8081:8080 --name demo-app-container ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
             }
