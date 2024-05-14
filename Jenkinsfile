@@ -1,11 +1,11 @@
 pipeline {
-    agent {
-        label 'docker' // Use a Docker-enabled agent
-    }
+    agent any
     environment {
         DOCKER_IMAGE = 'demo-app'
         DOCKER_TAG = 'latest'
-    }
+        }
+
+
     stages {
         stage('Checkout') {
             steps {
