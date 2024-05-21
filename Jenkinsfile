@@ -50,7 +50,7 @@ pipeline {
             }
         }
         cleanup {
-            node('ddanso') { /
+            node('ddanso') {
                 script {
                     bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
                 }
