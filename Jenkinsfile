@@ -35,7 +35,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    sh 'docker run -d -p 8081:8080 --name demo-app-container ${DOCKER_IMAGE}:${DOCKER_TAG}'
+                    bat 'docker run -d -p 8081:8080 --name demo-app-container ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
             }
         }
@@ -44,14 +44,14 @@ pipeline {
         always {
 
             script {
-                sh 'docker stop demo-app-container || true'
-                sh 'docker rm demo-app-container || true'
+                bat 'docker stop demo-app-container || true'
+                bat 'docker rm demo-app-container || true'
             }
         }
         cleanup {
 
             script {
-                sh 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
+                bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
             }
         }
     }
