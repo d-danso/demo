@@ -7,84 +7,52 @@ pipeline {
             }
         }
         stage('Build') {
-                       steps {
-
-                           bat 'mvn clean package'
-                       }
-                   }
-
-                   stage('Test') {
-                       steps {
-                           // Run tests if needed
-                           bat 'mvn test'
-                       }
-                   }
-
-                   stage('Deploy') {
-                       steps {
-                           // Copy the JAR file to the Docker context
-//                            bat 'cp target/demo-0.0.1-SNAPSHOT.jar .'
-                           // Build Docker image
-                           bat 'docker build -t demo-app .'
-                           // Run Docker container
-                           bat 'docker run -d -p 8081:8081 --name demo-container demo-app'
-                       }
-                   }
-    }
-     post {
-            always {
-                // Clean up Docker container and image after use
-                bat 'docker stop demo-container'
-                bat 'docker rm demo-container'
-                bat 'docker rmi demo-app'
+            steps {
+                bat 'mvn clean package'
             }
-        }}
-//     post {
-//         always {
-//             node('ddanso') {
-//                 script {
-//                     bat 'docker stop demo-app-container'
-//                     bat 'docker rm demo-app-container'
-//                 }
-//             }
-//         }
-//         cleanup {
-//             node('ddanso') {
-//                 script {
-//                     bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG}'
-//                 }
-//             }
-//         }
-//     }
-// }
+        }
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    // Check if the container exists and remove it if necessary
+                    def containerExists = bat(script: 'docker ps -a -q -f name=demo-container', returnStdout: true).trim()
+                    if (containerExists) {
+                        bat 'docker stop demo-container'
+                        bat 'docker rm demo-container'
+                    }
 
-// pipeline {
-//     agent any
-//
-//     stages {
-//         stage('Build') {
-//             steps {
-//                 // Build your Java application using Maven
-//                 sh 'mvn clean package'
-//             }
-//         }
-//
-//         stage('Test') {
-//             steps {
-//                 // Run tests if needed
-//                 // sh 'mvn test'
-//             }
-//         }
-//
-//         stage('Deploy') {
-//             steps {
-//                 // Copy the JAR file to the Docker context
-//                 sh 'cp target/demo-0.0.1-SNAPSHOT.jar .'
-//                 // Build Docker image
-//                 sh 'docker build -t demo-app .'
-//                 // Run Docker container
-//                 sh 'docker run -d -p 8081:8081 --name demo-container demo-app'
-//             }
-//         }
-//     }
-// }
+                    // Copy the JAR file to the Docker context if needed
+                    // bat 'copy target\\demo-0.0.1-SNAPSHOT.jar .'
+
+                    // Build Docker image
+                    bat 'docker build -t demo-app .'
+
+                    // Run Docker container
+                    bat 'docker run -d -p 8081:8081 --name demo-container demo-app'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                // Clean up Docker container and image after use
+                def containerExists = bat(script: 'docker ps -a -q -f name=demo-container', returnStdout: true).trim()
+                if (containerExists) {
+                    bat 'docker stop demo-container'
+                    bat 'docker rm demo-container'
+                }
+
+                def imageExists = bat(script: 'docker images -q demo-app', returnStdout: true).trim()
+                if (imageExists) {
+                    bat 'docker rmi demo-app'
+                }
+            }
+        }
+    }
+}
