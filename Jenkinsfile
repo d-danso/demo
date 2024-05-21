@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image  'maven:3.9.6-eclipse-temurin-17-alpine'
+            image 'maven:3.9.6-eclipse-temurin-17-alpine'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
@@ -17,12 +17,12 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                bat 'mvn clean package'
             }
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
+                bat 'mvn test'
             }
         }
         stage('Build Docker Image') {
@@ -42,18 +42,19 @@ pipeline {
     }
     post {
         always {
-
-            script {
-                bat 'docker stop demo-app-container || true'
-                bat 'docker rm demo-app-container || true'
+            node {
+                script {
+                    bat 'docker stop demo-app-container || true'
+                    bat 'docker rm demo-app-container || true'
+                }
             }
         }
         cleanup {
-
-            script {
-                bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
+            node {
+                script {
+                    bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
+                }
             }
         }
     }
 }
-
