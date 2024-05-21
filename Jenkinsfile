@@ -44,15 +44,15 @@ pipeline {
         always {
             node('ddanso') {
                 script {
-                    bat 'docker stop demo-app-container || true'
-                    bat 'docker rm demo-app-container || true'
+                    bat 'docker stop demo-app-container'
+                    bat 'docker rm demo-app-container'
                 }
             }
         }
         cleanup {
             node('ddanso') {
                 script {
-                    bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
+                    bat 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
             }
         }
