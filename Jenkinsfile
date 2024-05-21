@@ -23,11 +23,11 @@ pipeline {
                    stage('Deploy') {
                        steps {
                            // Copy the JAR file to the Docker context
-                           sh 'cp target/demo-0.0.1-SNAPSHOT.jar .'
+                           bat 'cp target/demo-0.0.1-SNAPSHOT.jar .'
                            // Build Docker image
-                           sh 'docker build -t demo-app .'
+                           bat 'docker build -t demo-app .'
                            // Run Docker container
-                           sh 'docker run -d -p 8081:8081 --name demo-container demo-app'
+                           bat 'docker run -d -p 8081:8081 --name demo-container demo-app'
                        }
                    }
     }}
