@@ -30,7 +30,15 @@ pipeline {
                            bat 'docker run -d -p 8081:8081 --name demo-container demo-app'
                        }
                    }
-    }}
+    }
+     post {
+            always {
+                // Clean up Docker container and image after use
+                bat 'docker stop demo-container'
+                bat 'docker rm demo-container'
+                bat 'docker rmi demo-app'
+            }
+        }}
 //     post {
 //         always {
 //             node('ddanso') {
