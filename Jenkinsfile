@@ -62,27 +62,29 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = 'my-docker-image:latest' // Adjust the image name here
-    }
-
     stages {
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
-                script {
-                    // Build Docker image
-                    docker.build("${DOCKER_IMAGE}")
-                }
+                // Build your Java application using Maven
+                sh 'mvn clean package'
             }
         }
-        // Other stages in your pipeline
-    }
 
-    post {
-        always {
-            // Clean up Docker resources
-            script {
-                docker.image("${DOCKER_IMAGE}").remove()
+        stage('Test') {
+            steps {
+                // Run tests if needed
+                // sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Copy the JAR file to the Docker context
+                sh 'cp target/demo-0.0.1-SNAPSHOT.jar .'
+                // Build Docker image
+                sh 'docker build -t demo-app .'
+                // Run Docker container
+                sh 'docker run -d -p 8081:8081 --name demo-container demo-app'
             }
         }
     }
