@@ -1,10 +1,10 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17-alpine'
-//             workingDir '/home/jenkins'
-        }
-    }
+    agent any
+//         docker {
+//             image 'maven:3.9.6-eclipse-temurin-17-alpine'
+// //          workingDir '/home/jenkins'
+//                    }
+//     }
     environment {
         DOCKER_IMAGE = 'demo-app'
         DOCKER_TAG = 'latest'
