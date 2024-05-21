@@ -60,12 +60,10 @@
 // }
 
 pipeline {
-  // Use docker directive for containerized build environment
   agent {
     docker {
       image 'maven:3.9.6-eclipse-temurin-17-alpine'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'  // Optional: Mount Docker socket for container-to-container communication
-      workingDir '/home/jenkins'  // Working directory inside the container (lowercase drive)
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
   environment {
@@ -73,15 +71,14 @@ pipeline {
     DOCKER_TAG = 'latest'
   }
   stages {
-       stage('Checkout') {
-           steps {
-               checkout scm
-           }
-
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
     }
     stage('Build') {
       steps {
-        sh 'mvn clean package'  // Use 'sh' for shell commands within the container
+        sh 'mvn clean package'
       }
     }
     stage('Test') {
@@ -91,7 +88,7 @@ pipeline {
     }
     stage('Build Docker Image') {
       steps {
-        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."  // Use string interpolation for image name and tag
+        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
       }
     }
     stage('Run Docker Container') {
@@ -100,15 +97,13 @@ pipeline {
       }
     }
   }
-  // Post actions in 'always' will run even if a stage fails
   post {
     always {
-      sh 'docker stop demo-app-container'  // Ensure container name matches the created one
+      sh 'docker stop demo-app-container'
       sh 'docker rm demo-app-container'
     }
-  }
-  // Cleanup actions in 'cleanup' will only run if the pipeline succeeds
-  cleanup {
-    sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG}"  // Replace with actual image name and tag
+    success {
+      sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG}"
+    }
   }
 }
