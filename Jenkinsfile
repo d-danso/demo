@@ -1,14 +1,5 @@
 pipeline {
     agent any
-//         docker {
-//             image 'maven:3.9.6-eclipse-temurin-17-alpine'
-// //          workingDir '/home/jenkins'
-//                    }
-//     }
-    environment {
-        DOCKER_IMAGE = 'demo-app'
-        DOCKER_TAG = 'latest'
-    }
     stages {
         stage('Checkout') {
             steps {
@@ -17,15 +8,15 @@ pipeline {
         }
         stage('Build') {
                        steps {
-                           // Build your Java application using Maven
-                           sh 'mvn clean package'
+
+                           bat 'mvn clean package'
                        }
                    }
 
                    stage('Test') {
                        steps {
                            // Run tests if needed
-                           sh 'mvn test'
+                           bat 'mvn test'
                        }
                    }
 
