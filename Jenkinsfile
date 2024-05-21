@@ -40,6 +40,20 @@ pipeline {
             }
         }
     }
+    post {
+        always {
 
+            script {
+                sh 'docker stop demo-app-container || true'
+                sh 'docker rm demo-app-container || true'
+            }
+        }
+        cleanup {
+
+            script {
+                sh 'docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
+            }
+        }
+    }
 }
 
